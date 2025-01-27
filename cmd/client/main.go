@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +16,7 @@ func main() {
 	serverAddr := "ws://localhost:8080/ws"
 	log.Printf("Connecting to %s", serverAddr)
 
-	log.Println("Enter your username:")
+	fmt.Print("[Enter your username]: ")
 	reader := bufio.NewReader(os.Stdin)
 	username, _ := reader.ReadString('\n')
 

@@ -1,13 +1,29 @@
 package models
 
 import (
-	"go-chat/pkg/chatroom_client"
-
 	"github.com/google/uuid"
 )
 
 type Message struct {
-	Client  *chatroom_client.ChatroomClient `json:"username"`
-	Message string                          `json:"message"`
-	Id      uuid.UUID                       `json:"id"`
+	Sender *Sender      `json:"sender"`
+	Data   *MessageData `json:"data"`
+	Id     uuid.UUID    `json:"id"`
 }
+
+type MessageData struct {
+	Content     string      `json:"content"`
+	MessageType MessageType `json:"type"`
+}
+
+type Sender struct {
+	Username string    `json:"username"`
+	Id       uuid.UUID `json:"id"`
+}
+
+type MessageType string
+
+const (
+	ClientConnected    MessageType = "client_connected"
+	ClientDisconnected MessageType = "client_disconnected"
+	ChatMessage        MessageType = "chat_message"
+)

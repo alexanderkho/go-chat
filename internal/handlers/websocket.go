@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"go-chat/internal/models"
 	"go-chat/pkg/chatroom"
 	"go-chat/pkg/chatroom_client"
 	"log"
@@ -29,10 +28,10 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close() // Ensure the connection is closed when the function ends
 
+	chatRoomManager := chatroom.GetChatRoomManager()
+
 	// Add user to chatroom
 	username := r.Header.Get("username")
-	chatRoomManager := chatroom.GetChatRoomManager()
-	// client := models.Client{Username: username, Id: uuid.New()}
 	client := chatroom_client.NewClient(username, uuid.New(), conn)
 	chatRoomManager.AddClient(client)
 	defer chatRoomManager.RemoveClient(client)
@@ -53,8 +52,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 				log.Println("Client closed the connection")
 				break
 			}
-			// Log and echo the message back to the client
-			chatRoomManager.BroadcastMessage(&models.Message{Client: client, Message: string(message), Id: uuid.New()})
+			chatRoomManager.BroadcastMessage(chatroom.ChatMessage(client, string(message)))
 		}
 	}()
 
