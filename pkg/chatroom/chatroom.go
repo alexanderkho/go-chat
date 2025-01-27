@@ -68,7 +68,6 @@ func connectedMessage(client *cc.ChatroomClient) *models.Message {
 		Id:     uuid.New(),
 		Sender: &models.Sender{Id: client.Id, Username: client.Username},
 		Data: &models.MessageData{
-			Content:     client.Username,
 			MessageType: models.ClientConnected,
 		},
 	}
@@ -79,7 +78,6 @@ func disconnectedMessage(client *cc.ChatroomClient) *models.Message {
 		Id:     uuid.New(),
 		Sender: &models.Sender{Id: client.Id, Username: client.Username},
 		Data: &models.MessageData{
-			Content:     client.Username,
 			MessageType: models.ClientDisconnected,
 		},
 	}

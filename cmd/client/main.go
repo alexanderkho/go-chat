@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"go-chat/internal/models"
 	"log"
 	"net/http"
 	"os"
@@ -36,12 +38,21 @@ func main() {
 	go func() {
 		defer close(done)
 		for {
-			_, message, err := conn.ReadMessage()
+			messageType, bytes, err := conn.ReadMessage()
 			if err != nil {
 				log.Println("Read error:", err)
 				return
 			}
-			log.Printf("Received: %s", message)
+
+			if messageType == websocket.TextMessage {
+				var message models.Message
+				err = json.Unmarshal(bytes, &message)
+				if err != nil {
+					log.Println("Unmarshal error:", err)
+					return
+				}
+				printMessage(message)
+			}
 		}
 	}()
 
@@ -79,5 +90,16 @@ func main() {
 	err = conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 	if err != nil {
 		log.Println("Close error:", err)
+	}
+}
+
+func printMessage(message models.Message) {
+	switch message.Data.MessageType {
+	case models.ClientConnected:
+		log.Printf("User %s connected", message.Sender.Username)
+	case models.ClientDisconnected:
+		log.Printf("User %s disconnected", message.Sender.Username)
+	case models.ChatMessage:
+		log.Printf("[%s]: %s", message.Sender.Username, message.Data.Content)
 	}
 }
