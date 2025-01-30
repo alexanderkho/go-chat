@@ -20,6 +20,13 @@ var upgrader = websocket.Upgrader{
 
 // HandleWebSocket handles WebSocket connections
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	// validate request
+	username := r.Header.Get("username")
+	if username == "" {
+		http.Error(w, "username header is required", http.StatusBadRequest)
+		return
+	}
+
 	// Upgrade the HTTP connection to a WebSocket connection
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -31,7 +38,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	chatRoomManager := chatroom.GetChatRoomManager()
 
 	// Add user to chatroom
-	username := r.Header.Get("username")
 	client := us.NewUserSession(username, uuid.New(), conn)
 	chatRoomManager.AddClient(client)
 	defer chatRoomManager.RemoveClient(client)
