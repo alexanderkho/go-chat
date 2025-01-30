@@ -2,7 +2,7 @@ package chatroom
 
 import (
 	"go-chat/internal/models"
-	cc "go-chat/pkg/chatroom_client"
+	us "go-chat/pkg/user_session"
 	"log"
 	"sync"
 
@@ -15,29 +15,29 @@ var (
 )
 
 type ChatRoomManager interface {
-	AddClient(client *cc.ChatroomClient)
-	RemoveClient(client *cc.ChatroomClient)
+	AddClient(client *us.UserSession)
+	RemoveClient(client *us.UserSession)
 	BroadcastMessage(message *models.Message)
 }
 
 type chatRoomManager struct {
-	clients map[uuid.UUID]*cc.ChatroomClient
+	clients map[uuid.UUID]*us.UserSession
 }
 
 func GetChatRoomManager() ChatRoomManager {
 	once.Do(func() {
-		chatRoomManagerInstance = &chatRoomManager{clients: make(map[uuid.UUID]*cc.ChatroomClient)}
+		chatRoomManagerInstance = &chatRoomManager{clients: make(map[uuid.UUID]*us.UserSession)}
 	})
 	return chatRoomManagerInstance
 }
 
-func (c *chatRoomManager) AddClient(client *cc.ChatroomClient) {
+func (c *chatRoomManager) AddClient(client *us.UserSession) {
 	c.clients[client.Id] = client
 	c.BroadcastMessage(connectedMessage(client))
 	log.Println("Client added to chat room", client.Username)
 }
 
-func (c *chatRoomManager) RemoveClient(client *cc.ChatroomClient) {
+func (c *chatRoomManager) RemoveClient(client *us.UserSession) {
 	delete(c.clients, client.Id)
 	c.BroadcastMessage(disconnectedMessage(client))
 	log.Println("Client removed from chat room", client.Username)
@@ -52,7 +52,7 @@ func (c *chatRoomManager) BroadcastMessage(message *models.Message) {
 	}
 }
 
-func ChatMessage(client *cc.ChatroomClient, message string) *models.Message {
+func ChatMessage(client *us.UserSession, message string) *models.Message {
 	return &models.Message{
 		Id:     uuid.New(),
 		Sender: &models.Sender{Id: client.Id, Username: client.Username},
@@ -63,7 +63,7 @@ func ChatMessage(client *cc.ChatroomClient, message string) *models.Message {
 	}
 }
 
-func connectedMessage(client *cc.ChatroomClient) *models.Message {
+func connectedMessage(client *us.UserSession) *models.Message {
 	return &models.Message{
 		Id:     uuid.New(),
 		Sender: &models.Sender{Id: client.Id, Username: client.Username},
@@ -73,7 +73,7 @@ func connectedMessage(client *cc.ChatroomClient) *models.Message {
 	}
 }
 
-func disconnectedMessage(client *cc.ChatroomClient) *models.Message {
+func disconnectedMessage(client *us.UserSession) *models.Message {
 	return &models.Message{
 		Id:     uuid.New(),
 		Sender: &models.Sender{Id: client.Id, Username: client.Username},

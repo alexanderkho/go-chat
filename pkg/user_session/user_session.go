@@ -1,4 +1,4 @@
-package chatroom_client
+package user_session
 
 import (
 	"encoding/json"
@@ -9,24 +9,23 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type IChatroomClient interface {
+type IUserSession interface {
 	PushMessage(message *models.Message)
 }
 
-type ChatroomClient struct {
+type UserSession struct {
 	Username string    `json:"username"`
 	Id       uuid.UUID `json:"id"`
 	Conn     *websocket.Conn
 }
 
-// verify that ChatroomClient implements IChatroomClient
-var _ IChatroomClient = &ChatroomClient{}
+var _ IUserSession = &UserSession{}
 
-func NewClient(username string, id uuid.UUID, conn *websocket.Conn) *ChatroomClient {
-	return &ChatroomClient{Username: username, Id: id, Conn: conn}
+func NewUserSession(username string, id uuid.UUID, conn *websocket.Conn) *UserSession {
+	return &UserSession{Username: username, Id: id, Conn: conn}
 }
 
-func (c *ChatroomClient) PushMessage(message *models.Message) {
+func (c *UserSession) PushMessage(message *models.Message) {
 	jsonMessage, err := json.Marshal(message)
 	if err != nil {
 		log.Println("Marshal error:", err)

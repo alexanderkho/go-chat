@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"go-chat/pkg/chatroom"
-	"go-chat/pkg/chatroom_client"
+	us "go-chat/pkg/user_session"
 	"log"
 	"net/http"
 
@@ -32,7 +32,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	// Add user to chatroom
 	username := r.Header.Get("username")
-	client := chatroom_client.NewClient(username, uuid.New(), conn)
+	client := us.NewUserSession(username, uuid.New(), conn)
 	chatRoomManager.AddClient(client)
 	defer chatRoomManager.RemoveClient(client)
 
