@@ -20,8 +20,8 @@ var upgrader = websocket.Upgrader{
 
 // HandleWebSocket handles WebSocket connections
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
 	// validate request
-	username := r.Header.Get("username")
 	if username == "" {
 		http.Error(w, "username header is required", http.StatusBadRequest)
 		return

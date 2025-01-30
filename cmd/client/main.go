@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -21,13 +22,12 @@ func main() {
 	fmt.Print("[Enter your username]: ")
 	reader := bufio.NewReader(os.Stdin)
 	username, _ := reader.ReadString('\n')
+	username = strings.Replace(username, "\n", "", -1)
 
-	header := http.Header{
-		"username": []string{username},
-	}
+	url := fmt.Sprintf("%s?username=%s", serverAddr, username)
 
 	// Connect to the server
-	conn, _, err := websocket.DefaultDialer.Dial(serverAddr, header)
+	conn, _, err := websocket.DefaultDialer.Dial(url, http.Header{})
 	if err != nil {
 		log.Fatal("Dial error:", err)
 	}
