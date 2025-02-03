@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "8080:8080" # Expose server on localhost:8080
+    volumes:
+      - ./frontend:/root/frontend # Mounts frontend dynamically
+    restart: unless-stopped
+  #
+  # client:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.client
+  #   depends_on:
+  #     - server  # Ensure the server starts before the client
+  #   environment:
+  #     SERVER_URL: "http://server:8080"  # Reference the server service by name
+  #   restart: unless-stopped
