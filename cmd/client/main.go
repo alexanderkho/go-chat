@@ -12,17 +12,27 @@ import (
 	"strings"
 	"time"
 
+	cfg "go-chat/pkg/config"
+
 	"github.com/gorilla/websocket"
 )
 
+type ClientConfig struct {
+	Host string `env:"HOST,required"`
+}
+
 func main() {
-	serverAddr := "ws://localhost:8080/ws"
-	log.Printf("Connecting to %s", serverAddr)
+	config, err := cfg.InitializeConfig[ClientConfig]("cmd/client/.env")
+	if err != nil {
+		log.Fatal("Error parsing env", err)
+	}
+	log.Printf("Connecting to %s", config.Host)
+	serverAddr := fmt.Sprintf("ws://%s/ws", config.Host)
 
 	fmt.Print("[Enter your username]: ")
 	reader := bufio.NewReader(os.Stdin)
 	username, _ := reader.ReadString('\n')
-	username = strings.Replace(username, "\n", "", -1)
+	username = strings.ReplaceAll(username, "\n", "")
 
 	url := fmt.Sprintf("%s?username=%s", serverAddr, username)
 

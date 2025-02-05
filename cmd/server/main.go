@@ -1,26 +1,31 @@
 package main
 
 import (
-	"fmt"
 	"go-chat/internal/handlers"
+	cfg "go-chat/pkg/config"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
-var (
-	Port      = ":8080"
-	PublicDir = "./frontend"
-)
+type ServerConfig struct {
+	Port      string `env:"PORT,required"`
+	PublicDir string `env:"PUBLIC_DIR,required"`
+}
 
 func main() {
-	fmt.Println("Server is running on port ", Port)
+	config, err := cfg.InitializeConfig[ServerConfig]("cmd/server/.env")
+	if err != nil {
+		log.Fatal("Error parsing env", err)
+	}
 	r := mux.NewRouter()
-	// r.HandleFunc("/", handlers.HomeHandler)
 	r.HandleFunc("/ws", handlers.HandleWebSocket)
 
-	fs := http.FileServer(http.Dir(PublicDir))
+	fs := http.FileServer(http.Dir(config.PublicDir))
 	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-	log.Fatal(http.ListenAndServe(Port, r))
+
+	// TODO: don't hardcode `localhost`
+	log.Println("Server running on localhost:" + config.Port)
+	log.Fatal(http.ListenAndServe("localhost:"+config.Port, r))
 }
