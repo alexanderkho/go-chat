@@ -4,7 +4,6 @@ services:
   server:
     build:
       context: .
-      dockerfile: Dockerfile.server
     ports:
       - "8080:8080" # Expose server on localhost:8080
     volumes:
